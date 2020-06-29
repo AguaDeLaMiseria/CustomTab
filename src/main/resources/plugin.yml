@@ -1,0 +1,9 @@
+name: CustomTab
+version: 1.0.0
+main: com.aguadelamiseria.customtab.CustomTab
+author: AguaDeLaMiseria
+description: Light-weight solution for custom tab completions!
+
+commands:
+  customtab:
+    description: Main command for CustomTab

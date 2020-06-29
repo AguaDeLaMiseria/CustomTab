@@ -1,0 +1,17 @@
+type: whitelist
+block-command-execution: true
+block-command-execution-message: "&cYou are not allowed to use that command!"
+
+groups:
+  default:
+    list:
+      - tpa
+      - spawn
+      - msg
+      - r
+      - help
+  mod:
+    list:
+      - enderchest
+      - ec
+      - kit
