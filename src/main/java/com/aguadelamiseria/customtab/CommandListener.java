@@ -6,10 +6,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CommandListener implements Listener {
 
-    private CustomTab customTab;
+    private final CustomTab customTab;
+    private final Pattern pattern = Pattern.compile("/([\\w-]+)");
 
     public CommandListener(CustomTab customTab){
         this.customTab = customTab;
@@ -19,30 +22,19 @@ public class CommandListener implements Listener {
     public void onCommandPreprocessed(PlayerCommandPreprocessEvent event){
         Player player = event.getPlayer();
 
-        if (player.hasPermission("customtab.bypass")) return;
+        if (player.hasPermission(CustomTab.BYPASS_PERMISSION)) return;
 
         List<String> allowedCommands = customTab.getCommandList(player);
 
-        String command = event.getMessage().split("\\s")[0].substring(1);
+        Matcher matcher = pattern.matcher(event.getMessage());
+        if (!matcher.find()) return;
+        String command = matcher.group(1);
 
-        if (customTab.getConfig().getString("type").equalsIgnoreCase("whitelist")){
-            if (!allowedCommands.contains(command)){
-                event.setCancelled(true);
-                String message = customTab.getConfig().getString("block-command-execution-message");
-
-                if (!message.isEmpty() || message != null){
-                    player.sendMessage(customTab.format(message));
-                }
-            }
-        } else {
-            if (allowedCommands.contains(command)){
-                event.setCancelled(true);
-                String message = customTab.getConfig().getString("block-command-execution-message");
-
-                if (!message.isEmpty() || message != null){
-                    player.sendMessage(customTab.format(message));
-                }
-            }
+        if (customTab.isWhitelist() && allowedCommands.contains(command)
+                || !customTab.isWhitelist() && !allowedCommands.contains(command)){
+            return;
         }
+        event.setCancelled(true);
+        customTab.sendMessage(player, "block-command-execution-message");
     }
 }
